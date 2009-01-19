@@ -1,0 +1,74 @@
+.emo-vote {
+width: 100%;
+padding: 0 !important;
+margin: 20px 0 0 0 !important;
+text-align: center;
+}
+.emo-vote img {
+margin: 0 !important;
+padding: 0 !important;
+border: 0 !important;
+}
+.emo-vote span {
+font-size: 90%;
+}
+.emo-vote p.emo-vote-title {
+padding: 0 0 2px 0 !important;
+font-weight: bold;
+}
+.emo_vote_total {
+height: 16px;
+width: 100%;
+text-align: center;
+margin: 10px 0 0 0;
+}
+.emo-vote label {
+position: relative;
+top: 2px;
+}
+span.emo_vote-0,span.emo_vote-1,span.emo_vote-2,span.emo_vote-3,span.emo_vote-4 {
+padding: 0 8px 0 0;
+position: relative;
+top: 2px;
+}
+.jquery-checkbox {
+display: inline;
+line-height: 18px;
+cursor: pointer;
+cursor: hand;
+padding: 0 4px 0 0;
+}
+.jquery-checkbox .mark {
+display: inline;
+}
+.jquery-checkbox img {
+vertical-align: middle;
+}
+#input_0 img {
+background: transparent url(images/checkbox_0.png) no-repeat top left;
+}
+#input_1 img {
+background: transparent url(images/checkbox_1.png) no-repeat top left;
+}
+#input_2 img {
+background: transparent url(images/checkbox_2.png) no-repeat top left;
+}
+#input_3 img {
+background: transparent url(images/checkbox_3.png) no-repeat top left;
+}
+#input_4 img {
+background: transparent url(images/checkbox_4.png) no-repeat top left;
+}
+.jquery-checkbox-hover img {
+background-position: -18px 0 !important;
+}
+.jquery-checkbox-disabled {
+cursor: default !important;
+}
+.jquery-checkbox-disabled img {
+background-position: -36px 0 !important;
+}
+.jquery-checkbox-checked img {
+background-position: -54px 0 !important;
+}
+span.emotion{background:#ff0000;height:18px;width:18px;margin:3px 0 0 0;display:block;float:left;}span.emo-delete{background:transparent url(images/delete.png) no-repeat top left;height:16px;width:16px;display:block;margin:-20px 0 0 180px;cursor:pointer;}span.emo-delete:hover{background-position:0 -16px;}li.emo_titles_field{margin: 0 0 10px;}li.emo_titles_field input{background:#fff;border:1px solid #dfdfdf;padding:3px;margin:0 15px 0 5px;}p.plain{margin:22px 0 0 0;line-height:24px;}span.emo_vote_error{margin:0 0 0 10px;color:#ff0000;}
