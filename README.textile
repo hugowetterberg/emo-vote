@@ -1,53 +1,46 @@
-=== Emo Vote ===
-Contributors: qvister, Mindpark
-Tags: emo, vote, plugin
-Requires at least: 2.7
-Tested up to: 2.7
-Stable tag: trunk
+h1. Emo Vote
 
 Encourage your users be letting them express their feelings by "emoting" rather then voting.
 
-== Description ==
+* Contributors: qvister, Mindpark
+* Tags: emo, vote, plugin
+* Requires at least: 2.7
+* Tested up to: 2.7
+* Stable tag: trunk
 
-Emo Vote let's you encourage your users be letting them express their feelings by "emoting" rather then voting.
-Emoting is a fairly simple activity, just press the button that describes your feeling towards the post you
-just read.
+h2. Description
 
-Thanks to [Mindpark](http://mindpark.se/in-english/) and especially [Joakim Jardenberg](http://jardenberg.se/)
-for sponsoring the development of this plugin. Without you this plugin wouldn't exist.
+Emo Vote let's you encourage your users be letting them express their feelings by "emoting" rather then voting. Emoting is a fairly simple activity, just press the button that describes your feeling towards the post you just read.
+
+Thanks to "Mindpark":http://mindpark.se/in-english/ and especially "Joakim Jardenberg":http://jardenberg.se/ for sponsoring the development of this plugin. Without you this plugin wouldn't exist.
 
 A few features listed below:
 
-*   Choose your own labels for each button.
-*   Drag 'n drop the buttons in your own order.
-*   Choose a unqiue question for each post, using WordPress custom fields, see FAQ for details.
-*   The buttons are fully customizeable using CSS.
-*   Emo Vote uses the same localization technique as the well-known function `comments_popup_link()`. Just replace the parameters according to your current locale, `<?php emo_vote_display('No votes','One vote','% votes'); ?>`.
+* Choose your own labels for each button.
+* Drag 'n drop the buttons in your own order.
+* Choose a unqiue question for each post, using WordPress custom fields, see FAQ for details.
+* The buttons are fully customizeable using CSS.
+* Emo Vote uses the same localization technique as the well-known function `comments_popup_link()`. Just replace the parameters according to your current locale, `<?php emo_vote_display('No votes','One vote','% votes'); ?>`.
 
-== Installation ==
+h2. Installation
 
-1. Download the plugin zip file.
-1. Unzip.
-1. Upload the `emo-vote/` folder to your `/wp-content/plugins/` directory.
-1. Activate the plugin through the Plugins menu in WordPress.
-1. Navigate to Settings > Emo Vote and customize it as you wish.
-1. Place `<?php emo_vote_display('No votes','One vote','% votes'); ?>` (localize the strings be replacing the parameters according to your current locale) in your template, for instance in `index.php` and `single.php`.
+* Download the plugin zip file.
+* Unzip.
+* Upload the `emo-vote/` folder to your `/wp-content/plugins/` directory.
+* Activate the plugin through the Plugins menu in WordPress.
+* Navigate to Settings > Emo Vote and customize it as you wish.
+* Place `<?php emo_vote_display('No votes','One vote','% votes'); ?>` (localize the strings be replacing the parameters according to your current locale) in your template, for instance in `index.php` and `single.php`.
 
-== Frequently Asked Questions ==
+h2. Frequently Asked Questions
 
-= I want to encourage my users even more by adding a question or statement before the emoting options =
+*I want to encourage my users even more by adding a question or statement before the emoting options*
 
 This is possible using WordPress built-in custom fields. Add a field with the name `emo-vote` and choose value.
 The value can be unique for each post.
 
-= The buttons looks like crappy blue squares in Internet Explorer 6 =
+*The buttons looks like crappy blue squares in Internet Explorer 6*
 
 How about upgrading your browser? Just kidding, some unlucky ones are still stuck with IE6.
-I would recommend [TwinHelix's PNGFix](http://www.twinhelix.com/css/iepngfix/).
+I would recommend "TwinHelix's PNGFix":http://www.twinhelix.com/css/iepngfix/.
 Place `iepngfix.htc` and `blank.gif` files in your webroot and add `behavior: url(/iepngfix.htc);` to the #input_0-#input_4 elements
 inside your `emo-vote.css` file.
-
-== Screenshots ==
-
-1. Emo Vote frontend.
-2. Emo Vote backend.
