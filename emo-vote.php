@@ -44,34 +44,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 			);');
 		}
 		
-		$url = str_replace('http://','',get_bloginfo('wpurl'));
-		$path_real = '/';
-		$paths = split('/',$url);
-		
-		/* Need to make sure if the 'Giving WordPress it's own directory' install method has been used */
-		if(get_bloginfo('wpurl') == get_bloginfo('home')) {
-			if(count($paths) > 0) {
-				unset($paths[0]);
-				foreach($paths as $path) {
-					$path_real .= $path;
-				}
-			}
-		}
-		
-		if(preg_match('/^http:\/\/www\./',get_bloginfo('wpurl'))) {
-			$url = str_replace('http://www','',get_bloginfo('wpurl'));
-		} else {
-			$url = str_replace('http://','',get_bloginfo('wpurl'));
-		}
-		if(count($url = split('/',$url)) > 0) {
-			$url = $url[0];
-		}
-		
-		$url = split('/',$url);
-		$url = $url[0];
 		$options = array(
-			'path' => $path_real,
-			'url' => $url,
 			'titles' => '0:mad#1:bored#2:curious#3:ok#4:happy',
 			'list' => 1,
 			'total' => 1,
@@ -100,8 +73,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 			echo '<div class="updated"><p><strong>Options Updated</strong></p></div>';
 		}
 		
-		/* Necessary to get the new values */
-		$options = get_option(EMO_OPTIONS);
 		$options['titles'] = split('#',$options['titles']);
 ?>
 	<form id="emo_form" method="post" action="options-general.php?page=emo-vote.php">
@@ -126,8 +97,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 					<option value="1" <?=($options['list'] == '1') ? 'selected' : ''?>>Percent</option>
 					<option value="0" <?=($options['list'] == '1') ? '' : 'selected'?>>Numbers</option>
 				</select>
-			</p>
-			<p class="plain">
 				<label for="<?=EMO_OPTIONS?>[total]">Display total votes</label>
 				<select name="<?=EMO_OPTIONS?>[total]">
 					<option value="1" <?=($options['total'] == '1') ? 'selected' : ''?>>Yes</option>
@@ -153,33 +122,34 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		$options['titles'] = split('#',$options['titles']);
 		$post_id = get_the_ID();
 		$question = get_post_meta($post_id,'emo-vote',true);
-		$return = (!$question) ? '<div class="emo-vote" id="post-'.$post_id.'">': '<div class="emo-vote" id="post-'.$post_id.'"><p class="emo-vote-title">'.$question.'</p>';
+		$return = (!$question) ? '<div class="emo-vote" id="emo-vote_'.$post_id.'">': '<div class="emo-vote" id="emo-vote_'.$post_id.'"><p class="emo-vote-title">'.$question.'</p>';
 		$table = $wpdb->prefix . 'emo';
 		
-		if(!$wpdb->get_var('select id from '.$table.' where post_ID='.$post_id.' limit 1')) {
-			$wpdb->query('insert into '.$table.'(post_ID) VALUES('.$post_id.')');
-		}
-		
-		if($options['list'] > 0) {
-			$values = $wpdb->get_results('select concat(round(vote_0/vote_total*100,0),\'%\') as vote_0,concat(round(vote_1/vote_total*100,0),\'%\') as vote_1,concat(round(vote_2/vote_total*100,0),\'%\') as vote_2,concat(round(vote_3/vote_total*100,0),\'%\') as vote_3,concat(round(vote_4/vote_total*100,0),\'%\') as vote_4,vote_total from '.$table.' where post_ID='.$post_id.' limit 1',ARRAY_A);
+		if(!$wpdb->get_var('select id from '.$table.' where post_ID = \''.$post_id.'\' limit 1')) {
+			$unit = ($options['list'] != 0) ? '%' : '';
+			$values[0] = array('vote_0' => 0 . $unit,'vote_1' => 0 . $unit,'vote_2' => 0 . $unit,'vote_3' => 0 . $unit,'vote_4' => 0 . $unit,'vote_total' => 0);
 		} else {
-			$values = $wpdb->get_results('select vote_0,vote_1,vote_2,vote_3,vote_4,vote_total from '.$table.' where post_ID='.$post_id.' limit 1',ARRAY_A);
+			if($options['list'] > 0) {
+				$values = $wpdb->get_results('select concat(round(vote_0/vote_total*100,0),\'%\') as vote_0,concat(round(vote_1/vote_total*100,0),\'%\') as vote_1,concat(round(vote_2/vote_total*100,0),\'%\') as vote_2,concat(round(vote_3/vote_total*100,0),\'%\') as vote_3,concat(round(vote_4/vote_total*100,0),\'%\') as vote_4,vote_total from '.$table.' where post_ID = \''.$post_id.'\' limit 1',ARRAY_A);
+			} else {
+				$values = $wpdb->get_results('select vote_0,vote_1,vote_2,vote_3,vote_4,vote_total from '.$table.' where post_ID = \''.$post_id.'\' limit 1',ARRAY_A);
+			}
 		}
 		
-		if(isset($_COOKIE['emo_vote-'.$post_id.''])) {
+		if(isset($_COOKIE['emo_vote-' . $post_id])) {
 			$disabled = 'disabled="disabled" ';
 		}
 		
 		foreach($options['titles'] as $title) {
 			$title = split(':',$title);
 			
-			if($_COOKIE['emo_vote-'.$post_id.''] == $title[0]) {
+			if($_COOKIE['emo_vote-' . $post_id] == $title[0]) {
 				$checked = 'checked="checked" ';
 			}
 			
 			$value = (!$values[0]['vote_' . $title[0]]) ? '0' : $values[0]['vote_' . $title[0]];
 			
-			$return .= '<input type="checkbox" name="emo_vote-'.$title[0].'" value="'.$title[0].'" id="emo_vote-'.$title[0].'" '.$disabled.''.$checked.'/><label for="emo_vote-'.$title[0].'">'.$title[1].'</label> <span class="emo_vote-'.$title[0].'">('.$value.')</span>';
+			$return .= '<input type="checkbox" name="emo_vote-'.$title[0].'" value="'.$title[0].'" class="emo_vote-'.$title[0].'" '.$disabled.''.$checked.'/><label>'.$title[1].'</label> <span class="emo_vote-'.$title[0].'">('.$value.')</span>';
 			$checked = null;
 			++$i;
 		}
@@ -192,10 +162,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 			} else {
 				$total = $zero;
 			}
-			$return .= '<input id="emo_locale" type="hidden" value="'.$zero.'#'.$one.'#'.$more.'" /><input id="emo_url" type="hidden" value="'.WP_PLUGIN_URL.'/'.basename(dirname(__FILE__)).'/" /><div class="emo_vote_total">'.$total.'</div></div>';
-		} else {
-			$return .= '<input id="emo_url" type="hidden" value="'.WP_PLUGIN_URL.'/'.basename(dirname(__FILE__)).'/" /></div>';
+			$return .= '<input class="emo_locale" type="hidden" value="'.$zero.'#'.$one.'#'.$more.'" /><div class="emo_vote_total">'.$total.'</div>';
 		}
+		
+		$return .= '<input class="emo_url" type="hidden" value="'.WP_PLUGIN_URL.'/'.basename(dirname(__FILE__)).'/" /></div>';
 		
 		echo $return;
 	}
@@ -205,28 +175,29 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		$option = $wpdb->escape($option);
 		$post_id = $wpdb->escape($post_id);
 		$option_var = 'vote_' . $option;
-		$query = 'select vote_'.$option.',vote_total from '.$wpdb->prefix.'emo where post_ID='.$post_id.' limit 1';
-		$results = $wpdb->get_results($query);
+		
+		if(!$wpdb->get_results('select vote_'.$option.',vote_total from '.$wpdb->prefix.'emo where post_ID = \''.$post_id.'\' limit 1'))
+			$wpdb->query('insert into '.$wpdb->prefix.'emo(post_ID) values(\''.$post_id.'\')');
+		
+		$results = $wpdb->get_results('select vote_'.$option.',vote_total from '.$wpdb->prefix.'emo where post_ID = \''.$post_id.'\' limit 1');
 		$option_new = intval($results[0]->$option_var);
 		$option_total = intval($results[0]->vote_total);
-
+		
 		++$option_new;
 		++$option_total;
 		
-		$query = 'update '.$wpdb->prefix.'emo set '.$option_var.'='.$option_new.',vote_total='.$option_total.' where post_id='.$post_id.'';
-		
-		if($wpdb->query($query)) {
+		if($wpdb->query('update '.$wpdb->prefix.'emo set '.$option_var.' = \''.$option_new.'\',vote_total = \''.$option_total.'\' where post_id = \''.$post_id.'\' limit 1')) {
 			/* Thanks to Stephen Cronin for solving the setcookie()-problem, http://www.scratch99.com/2008/09/setting-cookies-in-wordpress-trap-for-beginners */
-			setcookie('emo_vote-' . $post_id,$option,(time() + 2592000),$options['path'],$options['url']);
+			setcookie('emo_vote-' . $post_id,$option,(time() + 2592000),COOKIEPATH,COOKIE_DOMAIN);
 			if($options['list'] > 0) {
-				$return = $wpdb->get_results('select concat(round(vote_0/vote_total*100,0),\'%\') as vote_0,concat(round(vote_1/vote_total*100,0),\'%\') as vote_1,concat(round(vote_2/vote_total*100,0),\'%\') as vote_2,concat(round(vote_3/vote_total*100,0),\'%\') as vote_3,concat(round(vote_4/vote_total*100,0),\'%\') as vote_4,vote_total from '.$wpdb->prefix.'emo where post_ID='.$post_id.' limit 1');
+				$return = $wpdb->get_results('select concat(round(vote_0/vote_total*100,0),\'%\') as vote_0,concat(round(vote_1/vote_total*100,0),\'%\') as vote_1,concat(round(vote_2/vote_total*100,0),\'%\') as vote_2,concat(round(vote_3/vote_total*100,0),\'%\') as vote_3,concat(round(vote_4/vote_total*100,0),\'%\') as vote_4,vote_total from '.$wpdb->prefix.'emo where post_ID = \''.$post_id.'\' limit 1');
 				echo $_POST['callback'] . '(' . json_encode(array('response' => array('status' => 200, 'numbers' => $return))) . ')';
 			} else {
-				$return = $wpdb->get_results('select vote_0,vote_1,vote_2,vote_3,vote_4,vote_total from '.$wpdb->prefix.'emo where post_ID='.$post_id.' limit 1',ARRAY_A);
+				$return = $wpdb->get_results('select vote_0,vote_1,vote_2,vote_3,vote_4,vote_total from '.$wpdb->prefix.'emo where post_ID = \''.$post_id.'\' limit 1',ARRAY_A);
 				echo $_POST['callback'] . '(' . json_encode(array('response' => array('status' => 200, 'numbers' => $return))) . ')';
 			}
 		} else {
-			echo $_POST['callback'] . '(' . json_encode(array('response' => array('status' => 500, 'numbers' => $return))) . ')';
+			echo $_POST['callback'] . '(' . json_encode(array('response' => array('status' => 500, 'numbers' => null))) . ')';
 		}
 	}
 	function emo_options_menu() {
@@ -239,4 +210,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	
 	add_action('admin_menu','emo_options_menu');
 	add_action('wp_print_scripts','emo_js_frontend');
+	add_action('rss2_item','emo_vote_display_rss');
 ?>

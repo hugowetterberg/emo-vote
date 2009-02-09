@@ -50,7 +50,7 @@
 			}
 			
 			/* Creating div for checkbox and assigning "hover" event */
-			ch.wrapper = jQuery('<span id="input_' + $ch.attr('id').substr(9) + '"class="' + settings.cls + '"><span class="mark"><img src="' + settings.empty + '" /></span></span>');
+			ch.wrapper = jQuery('<span id="input_' + $ch.attr('class').substr(9) + '"class="' + settings.cls + '"><span class="mark"><img src="' + settings.empty + '" /></span></span>');
 			ch.wrapperInner = ch.wrapper.children('span');
 			ch.wrapper.hover(
 				function() { ch.wrapperInner.addClass(settings.cls + '-hover'); },
@@ -93,19 +93,20 @@
 	};
 })(jQuery);
 
-var limit = 5;
 jQuery(document).ready(function() {
 	jQuery('.emo-vote input[@type=checkbox]').checkbox({
 		cls: 'jquery-checkbox',
-		empty: jQuery('input[@id=emo_url]').val()+'images/empty.png'
+		empty: jQuery('input.emo_url').val()+'images/empty.png'
 	});
 	jQuery('.emo-vote input[@type=checkbox]').click(function() {
 		if(jQuery(this).attr('disabled'))
 			return;
-		var str;
-		var option = parseInt(jQuery(this).attr('id').substr(9));
-		var post = parseInt(jQuery(this).parent().attr('id').substr(5));
-		var url = jQuery('input[@id=emo_url]').val();
+		
+		var option = jQuery(this).attr('class').substr(9),post = jQuery(this).parent().attr('id').substr(9),url = jQuery('input.emo_url').val();
+		
+		jQuery('#emo-vote_'+post+' input[@type=checkbox]').attr('disabled',true);
+		jQuery(this).attr('checked',true);
+		
 		jQuery.ajax({
 			type: 'POST',
 			data: 'emo_vote=1&option='+option+'&post='+post,
@@ -113,21 +114,23 @@ jQuery(document).ready(function() {
 			url: url+'emo-vote-ajax.php',
 			success: function(j) {
 				if(j.response.status == 200) {
-					for(var i = 0; i < limit; i++) {
-						if(jQuery('.emo-vote[@id=post-'+post+'] input[@name=emo_vote-'+i+']').length > 0) {
-							jQuery('.emo-vote[@id=post-'+post+'] input[@name=emo_vote-'+i+']').attr('disabled','disabled').parent().find('span.emo_vote-'+i).html('('+j.response.numbers[0]['vote_'+i]+')');
+					var i = 0,str,locale;
+					
+					for(; i < 5; i++) {
+						if(jQuery('#emo-vote_'+post+' input[@name=emo_vote-'+i+']').length > 0) {
+							jQuery('span.emo_vote-'+i).html('('+j.response.numbers[0]['vote_'+i]+')');
 						}
 					}
-					if(jQuery('.emo-vote[@id=post-'+post+'] .emo_vote_total').length > 0) {
-						var locale = jQuery('input[@id=emo_locale]').val().split('#');
+					if(jQuery('#emo-vote_'+post+' .emo_vote_total').length > 0) {
+						locale = jQuery('input.emo_locale').val().split('#');
 						if(j.response.numbers[0]['vote_total'] > 1) {
 							str = j.response.numbers[0]['vote_total'] + ' ' + locale[2].substr(2);
 						} else if(j.response.numbers[0]['vote_total'] == 1) {
 							str = locale[1];
 						}
-						jQuery('.emo-vote[@id=post-'+post+'] .emo_vote_total').html(str);
+						jQuery('#emo-vote_'+post+' .emo_vote_total').html(str);
 					}
-				} else if(j['status'] == 'error') {
+				} else if(j.response.status == 500) {
 					alert('An error occurred, please try again');
 				}
 			}

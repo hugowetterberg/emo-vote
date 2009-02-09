@@ -1,8 +1,10 @@
 <?
-	/* Ugly hack to get access to all WP-functions */
-	require('../../../wp-load.php');
-	
-	if(isset($_POST['emo_vote'])) {
-		emo_vote($_POST['option'],$_POST['post']);
-	}
+header('Cache-Control: no-cache');
+header('Content-type: application/json');
+
+require('../../../wp-load.php');
+
+if(isset($_POST['emo_vote']) && !isset($_COOKIE['emo_vote-' . $_POST['post']])) {
+	emo_vote($_POST['option'],$_POST['post']);
+}
 ?>

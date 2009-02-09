@@ -1,3 +1,4 @@
+/* Begin frontend css */
 .emo-vote {
 width: 100%;
 padding: 0 !important;
@@ -71,4 +72,46 @@ background-position: -36px 0 !important;
 .jquery-checkbox-checked img {
 background-position: -54px 0 !important;
 }
-span.emotion{background:#ff0000;height:18px;width:18px;margin:3px 0 0 0;display:block;float:left;}span.emo-delete{background:transparent url(images/delete.png) no-repeat top left;height:16px;width:16px;display:block;margin:-20px 0 0 180px;cursor:pointer;}span.emo-delete:hover{background-position:0 -16px;}li.emo_titles_field{margin: 0 0 10px;}li.emo_titles_field input{background:#fff;border:1px solid #dfdfdf;padding:3px;margin:0 15px 0 5px;}p.plain{margin:22px 0 0 0;line-height:24px;}span.emo_vote_error{margin:0 0 0 10px;color:#ff0000;}
+/* End frontend css */
+
+/* Begin backend css */
+span.emotion {
+height: 18px;
+width: 18px;
+margin: 3px 0 0 0;
+display: block;
+float:left;
+cursor: move;
+}
+span.emo-delete {
+background: transparent url(images/delete.png) no-repeat top left;
+height: 16px;
+width: 16px;
+display: block;
+margin: -20px 0 0 180px;
+cursor: pointer;
+}
+span.emo-delete:hover {
+background-position: 0 -16px;
+}
+li.emo_titles_field {
+margin: 0 0 10px;
+}
+li.emo_titles_field input {
+background: #fff;
+border: 1px solid #dfdfdf;
+padding: 3px;
+margin: 0 15px 0 5px;
+}
+p.plain {
+margin: 22px 0 0 0;
+line-height: 24px;
+}
+p.plain select {
+margin: 0 10px 0 0;
+}
+span.emo_vote_error {
+margin: 0 0 0 10px;
+color:#ff0000;
+}
+/* End backend css */
