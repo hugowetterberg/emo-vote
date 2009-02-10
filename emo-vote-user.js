@@ -118,7 +118,7 @@ jQuery(document).ready(function() {
 					
 					for(; i < 5; i++) {
 						if(jQuery('#emo-vote_'+post+' input[@name=emo_vote-'+i+']').length > 0) {
-							jQuery('span.emo_vote-'+i).html('('+j.response.numbers[0]['vote_'+i]+')');
+							jQuery('#emo-vote_'+post+' span.emo_vote-'+i).html('('+j.response.numbers[0]['vote_'+i]+')');
 						}
 					}
 					if(jQuery('#emo-vote_'+post+' .emo_vote_total').length > 0) {
