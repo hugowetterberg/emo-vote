@@ -95,8 +95,6 @@
 (function($) {
 	$.fn.extend({
 		emoDialog:function(options) {
-			var options = $.extend({},'',options);
-			console.log(options);
 			this.append('<div id="emo-vote-body"><div id="emo-vote-dialog"><p>Feeling '+options.str+'?<br /><br /><a href="#">No</a>&nbsp;&nbsp;<a href="#'+options.option+'">Yes</a></p></div></div>');
 			
 			jQuery('#emo-vote-dialog a').click(function() {
