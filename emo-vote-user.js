@@ -92,6 +92,27 @@
 		});
 	};
 })(jQuery);
+(function($) {
+	$.fn.extend({
+		emoDialog:function(options) {
+			var options = $.extend({},'',options);
+			console.log(options);
+			this.append('<div id="emo-vote-body"><div id="emo-vote-dialog"><p>Feeling '+options.str+'?<br /><br /><a href="#">No</a>&nbsp;&nbsp;<a href="#'+options.option+'">Yes</a></p></div></div>');
+			
+			jQuery('#emo-vote-dialog a').click(function() {
+				var option = jQuery(this).attr('href').substr(1);
+				
+				jQuery('#emo-vote-body').fadeOut(500,function() {
+					jQuery(this).remove();
+					
+					if(option)
+						jQuery('.emo-vote input[@name=emo_vote-'+option+']').click();
+				});
+				return;
+			});
+		}
+	});
+})(jQuery);
 
 jQuery(document).ready(function() {
 	jQuery('.emo-vote input[@type=checkbox]').checkbox({
