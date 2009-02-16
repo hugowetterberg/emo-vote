@@ -171,7 +171,7 @@ function emo_vote_display($zero='No votes',$one='1 vote',$more='% votes') {
 	
 	echo $return;
 }
-function emo_vote_display_rss() {
+function emo_vote_display_rss($content) {
 	$options = get_option(EMO_OPTIONS);
 	
 	if($options['rss'] > 0 && is_feed()) {
@@ -190,7 +190,7 @@ function emo_vote_display_rss() {
 		
 		echo $content;
 	} else {
-		echo get_the_content();
+		echo $content;
 	}
 }
 function is_emo($post_id=null) {
