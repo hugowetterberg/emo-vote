@@ -176,7 +176,7 @@ function emo_vote_display_rss($content) {
 	
 	if($options['rss'] > 0 && is_feed()) {
 		$question = get_post_meta(get_the_ID(),'emo-vote',true);
-		$content = get_the_content() .'<p style="text-align:center;">';
+		$content .= '<p style="text-align:center;">';
 		$content .= (!$question) ? '' : $question .'</p><p style="text-align:center;">';
 		$permalink = (!get_option('permalink_structure')) ? get_permalink(get_the_ID()) . '&amp;' : get_permalink(get_the_ID()) . '?';
 		$options['titles'] = split('#',$options['titles']);
@@ -188,9 +188,9 @@ function emo_vote_display_rss($content) {
 		
 		$content .= '</p>';
 		
-		echo $content;
+		return $content;
 	} else {
-		echo $content;
+		return $content;
 	}
 }
 function is_emo($post_id=null) {
