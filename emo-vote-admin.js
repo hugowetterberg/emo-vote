@@ -11,8 +11,7 @@ update = function() {
 	
 	for(var i = 0; i < arr.length; i++) {
 		str += arr[i].substr(11)+':'+jQuery('input[@name='+arr[i]+']').val();
-		if(i < arr.length - 1)
-			str += '#';
+		if(i < arr.length - 1) { str += '#'; }
 	}
 	jQuery('input[@id=emo_options_titles]').val(str);
 }
@@ -26,8 +25,8 @@ jQuery('#emo_add').click(function() {
 		}
 		jQuery('#emo-list').append('<li id="emo_titles-'+k+'" class="emo_titles_field"><span class="emotion" style="background: transparent url('+jQuery('#emo_vote_url').html()+'checkbox_'+k+'.png);"></span><input type="text" size="16" name="emo_titles-'+k+'" id="emo_titles-'+k+'" value="" /><span class="emo-delete" id="emo_titles-'+k+'"></span></li>');
 	} else {
-		jQuery('.emo_vote_error').html('You can\'t add more then five fields');
-		setTimeout(function(){jQuery('.emo_vote_error').html('');},2000);
+		jQuery('.emo_vote_error').show();
+		setTimeout(function(){ jQuery('.emo_vote_error').hide(); },2000);
 	}
 	return false;
 });

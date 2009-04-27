@@ -95,7 +95,7 @@
 (function($) {
 	$.fn.extend({
 		emoDialog:function(options) {
-			this.append('<div id="emo-vote-body"><div id="emo-vote-dialog"><p>Feeling '+options.str+'?<br /><br /><a href="#">No</a>&nbsp;&nbsp;<a href="#'+options.option+'">Yes</a></p></div></div>');
+			this.append('<div id="emo-vote-body"><div id="emo-vote-dialog"><p>'+options.str+'?<br /><br /><a href="#">No</a>&nbsp;&nbsp;<a href="#'+options.option+'">Yes</a></p></div></div>');
 			
 			jQuery('#emo-vote-dialog a').click(function() {
 				var option = jQuery(this).attr('href').substr(1);
