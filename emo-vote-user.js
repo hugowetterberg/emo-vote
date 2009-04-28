@@ -36,7 +36,7 @@
 				10 /* in miliseconds. Low numbers this can decrease performance on slow computers, high will increase responce time */
 			);
 			return $object;
-		}
+		};
 		try { console.log(this); } catch(e) {}
 		/* Wrapping all passed elements */
 		return this.each(function() 
@@ -121,7 +121,7 @@ jQuery(document).ready(function() {
 		if(jQuery(this).attr('disabled'))
 			return;
 		
-		var option = jQuery(this).attr('class').substr(9),post = jQuery(this).parent().attr('id').substr(9),url = jQuery('input.emo_url').val();
+		var option = jQuery(this).attr('class').substr(9),post = jQuery(this).parent().attr('id').substr(9);
 		
 		jQuery('#emo-vote_'+post+' input[@type=checkbox]').attr('disabled',true);
 		jQuery(this).attr('checked',true);
@@ -130,21 +130,20 @@ jQuery(document).ready(function() {
 			type: 'POST',
 			data: 'emo_vote=1&option='+option+'&post='+post,
 			dataType: 'jsonp',
-			url: url+'emo-vote-ajax.php',
 			success: function(j) {
 				if(j.response.status == 200) {
 					var i = 0,str,locale;
 					
 					for(; i < 5; i++) {
 						if(jQuery('#emo-vote_'+post+' input[@name=emo_vote-'+i+']').length > 0) {
-							jQuery('#emo-vote_'+post+' span.emo_vote-'+i).html('('+j.response.numbers[0]['vote_'+i]+')');
+							jQuery('#emo-vote_'+post+' span.emo_vote-'+i).html('('+j.response.numbers['vote_'+i]+')');
 						}
 					}
 					if(jQuery('#emo-vote_'+post+' .emo_vote_total').length > 0) {
 						locale = jQuery('input.emo_locale').val().split('#');
-						if(j.response.numbers[0]['vote_total'] > 1) {
-							str = j.response.numbers[0]['vote_total'] + ' ' + locale[2].substr(2);
-						} else if(j.response.numbers[0]['vote_total'] == 1) {
+						if(j.response.numbers['vote_total'] > 1) {
+							str = j.response.numbers['vote_total'] + ' ' + locale[2].substr(2);
+						} else if(j.response.numbers['vote_total'] == 1) {
 							str = locale[1];
 						}
 						jQuery('#emo-vote_'+post+' .emo_vote_total').html(str);

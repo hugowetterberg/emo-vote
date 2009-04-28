@@ -123,52 +123,42 @@ add_action('admin_menu','emo_options_menu');
 
 function emo_vote_display($zero='No votes',$one='1 vote',$more='% votes') {
 	global $wpdb;
-	$i = 0;
 	$vote = strval($_GET['emo']);
 	$options = get_option(EMO_OPTIONS);
-	$options['titles'] = split('#',$options['titles']);
+	$titles = split('[#]+',$options['titles']);
 	$post_id = get_the_ID();
 	$question = get_post_meta($post_id,'emo-vote',true);
 	$return = !$question ? '<div class="emo-vote" id="emo-vote_'. $post_id .'">' : '<div class="emo-vote" id="emo-vote_'. $post_id .'"><p class="emo-vote-title">'. $question .'</p>';
 	
 	if(!$wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->emo_vote} WHERE post_ID = %d LIMIT 1",$post_id))) {
-		$unit = $options['list'] != 0 ? '%' : '';
-		$values[0] = array('vote_0' => 0 . $unit,'vote_1' => 0 . $unit,'vote_2' => 0 . $unit,'vote_3' => 0 . $unit,'vote_4' => 0 . $unit,'vote_total' => 0);
+		$unit = $options['list'] > 0 ? '%' : '';
+		$values = array('vote_0' => 0 . $unit,'vote_1' => 0 . $unit,'vote_2' => 0 . $unit,'vote_3' => 0 . $unit,'vote_4' => 0 . $unit,'vote_total' => 0);
 	} else {
-		if($options['list'] > 0) {
-			$values = $wpdb->get_results($wpdb->prepare("SELECT CONCAT(round(vote_0/vote_total*100,0),'&#37;') as vote_0, CONCAT(round(vote_1/vote_total*100,0),'&#37;') as vote_1, CONCAT(round(vote_2/vote_total*100,0),'&#37;') as vote_2, CONCAT(round(vote_3/vote_total*100,0),'&#37;') as vote_3, CONCAT(round(vote_4/vote_total*100,0),'&#37;') as vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = '%d' LIMIT 1",$post_id),ARRAY_A);
-		} else {
-			$values = $wpdb->get_results($wpdb->prepare("SELECT vote_0, vote_1, vote_2, vote_3, vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d LIMIT 1",$post_id),ARRAY_A);
-		}
+		if($options['list'] > 0)
+			$values = $wpdb->get_row($wpdb->prepare("SELECT CONCAT(round(vote_0/vote_total*100,0),'&#37;') as vote_0, CONCAT(round(vote_1/vote_total*100,0),'&#37;') as vote_1, CONCAT(round(vote_2/vote_total*100,0),'&#37;') as vote_2, CONCAT(round(vote_3/vote_total*100,0),'&#37;') as vote_3, CONCAT(round(vote_4/vote_total*100,0),'&#37;') as vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
+		else
+			$values = $wpdb->get_row($wpdb->prepare("SELECT vote_0, vote_1, vote_2, vote_3, vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
 	}
 	
 	if(is_emo())
 		$disabled = 'disabled="disabled" ';
 	
-	foreach($options['titles'] as $option) {
-		list($key,$val) = split(':',$option);
+	foreach($titles as $title) {
+		list($key,$val) = split(':',$title);
 		
 		if($_COOKIE['emo_vote-'. $post_id] == $key)
 			$checked = 'checked="checked" ';
 		
-		$value = !$values[0]['vote_'. $key] ? '0' : $values[0]['vote_'. $key];
+		$value = $values['vote_'. $key] ? $values['vote_'. $key] : '0';
 		$return .= '<input type="checkbox" name="emo_vote-'. $key .'" value="'. $key .'" class="emo_vote-'. $key .'" '. $disabled .''. $checked .'/><label>'. $val .'</label> <span class="emo_vote-'. $key .'">('. $value .')</span>';
 		$checked = null;
-		++$i;
 	}
 	
 	if($options['total'] > 0) {
-		if($values[0]['vote_total'] > 1) {
-			$total = str_replace('%',$values[0]['vote_total'],$more);
-		} elseif($values[0]['vote_total'] == 1) {
-			$total = $one;
-		} else {
-			$total = $zero;
-		}
+		$total = $values['vote_total'] > 1 ? str_replace('%',$values['vote_total'],$more) : ($values['vote_total'] == 1 ? $one : $zero);
 		$return .= '<input class="emo_locale" type="hidden" value="'. $zero .'#'. $one .'#'. $more .'" /><div class="emo_vote_total">'. $total .'</div>';
 	}
 	
-	// probably not needed since we going to change the ajax method.
 	$return .= '<input class="emo_url" type="hidden" value="'. emo_path() .'" /></div>';
 	
 	if(is_single() && !is_emo() && strlen($vote) > 0)
@@ -212,38 +202,45 @@ function emo_path($file=null) {
 	return path_join(WP_PLUGIN_URL,basename(dirname(__FILE__))) .'/'. $file;
 }
 
-function emo_vote($option,$post_id) {
-	global $wpdb;
-	$options = get_option(EMO_OPTIONS);
-	$vote_key = 'vote_'. $option;
+function emo_vote() {
+	if(isset($_POST['emo_vote']) && isset($_POST['option']) && isset($_POST['post']) && !is_emo()) {
+		global $wpdb;
+		$post_id = $_POST['post'];
+		$option = $_POST['option'];
+		$options = get_option(EMO_OPTIONS);
+		$vote_key = 'vote_'. $option;
 	
-	// Insert a row for the post first when a user emotes.
-	if(!$wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->emo_vote} WHERE post_id = %d LIMIT 1",$post_id)))
-		$wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->emo_vote} (post_ID) VALUES (%d)",$post_id));
+		// Insert a row for the post first when a user emotes.
+		if(!$wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->emo_vote} WHERE post_id = %d LIMIT 1",$post_id)))
+			$wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->emo_vote} (post_ID) VALUES (%d)",$post_id));
 	
-	// Update the choosen key and total sum.
-	$results = $wpdb->get_row($wpdb->prepare("SELECT {$vote_key},vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
-	$vote_val = intval($results[$vote_key]);
-	$vote_total = intval($results['vote_total']);
-	++$vote_val;
-	++$vote_total;
+		// Update the choosen key and total sum.
+		$results = $wpdb->get_row($wpdb->prepare("SELECT {$vote_key},vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
+		$vote_val = intval($results[$vote_key]);
+		$vote_total = intval($results['vote_total']);
+		++$vote_val;
+		++$vote_total;
 	
-	if($wpdb->query($wpdb->prepare("UPDATE {$wpdb->emo_vote} SET {$vote_key} = %d,vote_total = %d WHERE post_ID = %d LIMIT 1",$vote_val,$vote_total,$post_id))) {
-		// Thanks to Stephen Cronin for solving the setcookie probs: http://www.scratch99.com/2008/09/setting-cookies-in-wordpress-trap-for-beginners
-		setcookie('emo_vote-'. $post_id,$option,time() + 2592000,COOKIEPATH,COOKIE_DOMAIN);
+		if($wpdb->query($wpdb->prepare("UPDATE {$wpdb->emo_vote} SET {$vote_key} = %d,vote_total = %d WHERE post_ID = %d LIMIT 1",$vote_val,$vote_total,$post_id))) {
+			// Thanks to Stephen Cronin for solving the setcookie probs: http://www.scratch99.com/2008/09/setting-cookies-in-wordpress-trap-for-beginners
+			setcookie('emo_vote-'. $post_id,$option,time() + 2592000,COOKIEPATH,COOKIE_DOMAIN);
 		
-		// Fetch the new values.
-		if($options['list'] > 0) {
-			$return = $wpdb->get_results($wpdb->prepare("SELECT CONCAT(round(vote_0/vote_total*100,0),'&#37;') as vote_0, CONCAT(round(vote_1/vote_total*100,0),'&#37;') as vote_1, CONCAT(round(vote_2/vote_total*100,0),'&#37;') as vote_2, CONCAT(round(vote_3/vote_total*100,0),'&#37;') as vote_3, CONCAT(round(vote_4/vote_total*100,0),'&#37;') as vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = '%d' LIMIT 1",$post_id),ARRAY_A);
+			// Fetch the new values.
+			if($options['list'] > 0)
+				$return = $wpdb->get_row($wpdb->prepare("SELECT CONCAT(round(vote_0/vote_total*100,0),'&#37;') as vote_0, CONCAT(round(vote_1/vote_total*100,0),'&#37;') as vote_1, CONCAT(round(vote_2/vote_total*100,0),'&#37;') as vote_2, CONCAT(round(vote_3/vote_total*100,0),'&#37;') as vote_3, CONCAT(round(vote_4/vote_total*100,0),'&#37;') as vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
+			else
+				$return = $wpdb->get_row($wpdb->prepare("SELECT vote_0, vote_1, vote_2, vote_3, vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
+		
+			echo $_POST['callback'] .'('. json_encode(array('response' => array('status' => 200, 'numbers' => $return))) .')';
 		} else {
-			$return = $wpdb->get_results($wpdb->prepare("SELECT vote_0, vote_1, vote_2, vote_3, vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d LIMIT 1",$post_id),ARRAY_A);
+			echo $_POST['callback'] .'('. json_encode(array('response' => array('status' => 500, 'numbers' => null))) .')';
 		}
 		
-		echo $_POST['callback'] .'('. json_encode(array('response' => array('status' => 200, 'numbers' => $return))) .')';
-	} else {
-		echo $_POST['callback'] .'('. json_encode(array('response' => array('status' => 500, 'numbers' => null))) .')';
+		// End ajax-request.
+		die();
 	}
 }
+add_action('init','emo_vote');
 
 function emo_options_menu() {
 	add_options_page('Emo Vote','Emo Vote',8,basename(__FILE__),'emo_options_page');

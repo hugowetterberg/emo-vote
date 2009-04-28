@@ -49,7 +49,7 @@ msgstr "Ja"
 #: emo-vote.php:100
 #: emo-vote.php:105
 msgid "No"
-msgstr "No"
+msgstr "Nej"
 
 #: emo-vote.php:102
 msgid "Enable RSS emoting"
