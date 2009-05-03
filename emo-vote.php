@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 define('EMO_OPTIONS','emo_options');
+define('EMO_WIDGET','emo_widget');
 define('EMO_LOCAL','emo-vote');
 
 function emo_install() {
@@ -73,6 +74,7 @@ function emo_options_page() {
 		$options['total'] = $post['total'];
 		$options['rss'] = $post['rss'];
 		update_option(EMO_OPTIONS,$options);
+		emo_widget_cache(true);
 		echo '<div class="updated"><p><strong>'. __('Options Updated',EMO_LOCAL) .'</strong></p></div>';
 	}
 	
@@ -209,28 +211,28 @@ function emo_vote() {
 		$option = $_POST['option'];
 		$options = get_option(EMO_OPTIONS);
 		$vote_key = 'vote_'. $option;
-	
+		
 		// Insert a row for the post first when a user emotes.
 		if(!$wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->emo_vote} WHERE post_id = %d LIMIT 1",$post_id)))
 			$wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->emo_vote} (post_ID) VALUES (%d)",$post_id));
-	
+		
 		// Update the choosen key and total sum.
 		$results = $wpdb->get_row($wpdb->prepare("SELECT {$vote_key},vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
 		$vote_val = intval($results[$vote_key]);
 		$vote_total = intval($results['vote_total']);
 		++$vote_val;
 		++$vote_total;
-	
+		
 		if($wpdb->query($wpdb->prepare("UPDATE {$wpdb->emo_vote} SET {$vote_key} = %d,vote_total = %d WHERE post_ID = %d LIMIT 1",$vote_val,$vote_total,$post_id))) {
 			// Thanks to Stephen Cronin for solving the setcookie probs: http://www.scratch99.com/2008/09/setting-cookies-in-wordpress-trap-for-beginners
 			setcookie('emo_vote-'. $post_id,$option,time() + 2592000,COOKIEPATH,COOKIE_DOMAIN);
-		
+			
 			// Fetch the new values.
 			if($options['list'] > 0)
 				$return = $wpdb->get_row($wpdb->prepare("SELECT CONCAT(round(vote_0/vote_total*100,0),'&#37;') as vote_0, CONCAT(round(vote_1/vote_total*100,0),'&#37;') as vote_1, CONCAT(round(vote_2/vote_total*100,0),'&#37;') as vote_2, CONCAT(round(vote_3/vote_total*100,0),'&#37;') as vote_3, CONCAT(round(vote_4/vote_total*100,0),'&#37;') as vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
 			else
 				$return = $wpdb->get_row($wpdb->prepare("SELECT vote_0, vote_1, vote_2, vote_3, vote_4, vote_total FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post_id),ARRAY_A);
-		
+			
 			echo $_POST['callback'] .'('. json_encode(array('response' => array('status' => 200, 'numbers' => $return))) .')';
 		} else {
 			echo $_POST['callback'] .'('. json_encode(array('response' => array('status' => 500, 'numbers' => null))) .')';
@@ -251,4 +253,89 @@ function emo_js_frontend() {
 	wp_enqueue_script('emo-vote.php',emo_path('emo-vote-user.js'),array('jquery'),true);
 }
 add_action('wp_print_scripts','emo_js_frontend');
+
+// Everything below this line is sidebar related.
+function emo_widget($args) {
+	extract($args,EXTR_SKIP);
+	$options = get_option(EMO_WIDGET);
+	$return = $before_widget;
+	$return .= $before_title;
+	$return .= $options['title'] ? $options['title'] : __('Emo Vote',EMO_LOCAL);
+	$return .= $after_title;
+	$return .= emo_widget_cache();
+	$return .= $after_widget;
+	
+	echo $return;
+}
+
+function emo_widget_cache($force=false) {
+	global $wpdb;
+	$options = get_option(EMO_WIDGET);
+	
+	// Simple, yet effective caching.
+	if($options['timestamp'] < time() - 1800 || $force) {
+		$cache = '<ul>';
+		$limit = $options['limit'] ? $options['limit'] : 5;
+		$options_emo = get_option(EMO_OPTIONS);
+		$titles = split('[#]+',$options_emo['titles']);
+		
+		foreach($titles as $title) {
+			list($key,$val) = split(':',$title);
+			$posts = $wpdb->get_results($wpdb->prepare("SELECT post_ID FROM {$wpdb->emo_vote} ORDER BY vote_{$key} DESC LIMIT %d",$limit),ARRAY_A);
+			
+			if($posts) {
+				$cache .= '<li class="emo_widget_title">'. $val .'</li><ul>';
+				
+				foreach($posts as $post) {
+					if($options_emo['list'] > 0) {
+						$count = $wpdb->get_var($wpdb->prepare("SELECT CONCAT(round(vote_{$key}/vote_total*100,0),'&#37;') as vote_{$key} FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post['post_ID']));
+					} else {
+						$count = $wpdb->get_var($wpdb->prepare("SELECT vote_{$key} FROM {$wpdb->emo_vote} WHERE post_ID = %d",$post['post_ID']));
+					}
+					
+					$cache .= sprintf('<li><a href="%s">%s (%s)</a></li>',get_permalink($post['post_ID']),get_the_title($post['post_ID']),$count);
+				}
+				
+				$cache .= '</ul>';
+			}
+		}
+		
+		$cache .= '</ul>';
+		$options['cache'] = $cache;
+		$options['timestamp'] = time();
+		update_option(EMO_WIDGET,$options);
+	}
+	
+	return $options['cache'];
+}
+
+function emo_widget_control() {
+	$options = get_option(EMO_WIDGET) ? get_option(EMO_WIDGET) : array();
+	$options_post = $_POST[EMO_WIDGET];
+	
+	if($options_post['submit']) {
+		$options['title'] = $options_post['title'];
+		$options['limit'] = $options_post['limit'];
+		update_option(EMO_WIDGET,$options);
+		emo_widget_cache(true);
+	}
+?>
+<p>
+	<label for="<? echo EMO_WIDGET; ?>-title"><? _e('Title',EMO_LOCAL) ?>:</label>
+	<input class="widefat" type="text" name="<? echo EMO_WIDGET; ?>[title]" id="<? echo EMO_WIDGET; ?>-title" value="<? echo $options['title']; ?>" />
+</p>
+<p>
+	<label for="<? echo EMO_WIDGET; ?>-limit"><? _e('Posts per feeling',EMO_LOCAL) ?>:</label>
+	<input class="widefat" type="text" name="<? echo EMO_WIDGET; ?>[limit]" id="<? echo EMO_WIDGET; ?>-limit" value="<? echo ($options['limit'] ? $options['limit'] : '5'); ?>" />
+	<small><? _e('Default value is five posts per feeling',EMO_LOCAL); ?></small>
+	<input type="hidden" name="<? echo EMO_WIDGET; ?>[submit]" value="1" />
+</p>
+<?
+}
+
+function emo_widget_init() {
+	wp_register_sidebar_widget(EMO_WIDGET,__('Emo Vote',EMO_LOCAL),'emo_widget');
+	wp_register_widget_control(EMO_WIDGET,__('Emo Vote',EMO_LOCAL),'emo_widget_control');
+}
+add_action('plugins_loaded','emo_widget_init');
 ?>

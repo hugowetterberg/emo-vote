@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Emo Vote\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-27 21:22+0100\n"
+"POT-Creation-Date: 2009-04-29 21:02+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Anton Lindqvist <anton@qvister.se>\n"
 "Language-Team: \n"
@@ -12,62 +12,81 @@ msgstr ""
 "X-Poedit-KeywordsList: _e;__\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: ..\n"
 
-#: emo-vote.php:74
+#: ../emo-vote.php:78
 msgid "Options Updated"
 msgstr "Dina inställningar har sparats"
 
-#: emo-vote.php:81
+#: ../emo-vote.php:85
 msgid "Emo Vote Options"
 msgstr "Emo Vote inställningar"
 
-#: emo-vote.php:82
+#: ../emo-vote.php:86
 msgid "Choose number of fields, give them a desired name and move them around until you're satisfied then hit Update Options."
 msgstr "Välj ett antal fält (max fem) och tilldela dem ett namn. Du kan även byta ordning på fälten genom att dra i ikonen till vänster om fältet. När du är nöjd klickar du på Spara."
 
-#: emo-vote.php:92
+#: ../emo-vote.php:96
 msgid "Display votes in"
 msgstr "VIsa röster i"
 
-#: emo-vote.php:94
+#: ../emo-vote.php:98
 msgid "Percent"
 msgstr "Procent"
 
-#: emo-vote.php:95
+#: ../emo-vote.php:99
 msgid "Numbers"
 msgstr "Siffror"
 
-#: emo-vote.php:97
+#: ../emo-vote.php:101
 msgid "Display total votes"
 msgstr "Visa totalt antal röster"
 
-#: emo-vote.php:99
-#: emo-vote.php:104
+#: ../emo-vote.php:103
+#: ../emo-vote.php:108
 msgid "Yes"
 msgstr "Ja"
 
-#: emo-vote.php:100
-#: emo-vote.php:105
+#: ../emo-vote.php:104
+#: ../emo-vote.php:109
 msgid "No"
 msgstr "Nej"
 
-#: emo-vote.php:102
+#: ../emo-vote.php:106
 msgid "Enable RSS emoting"
 msgstr "Aktivera Emo Vote via RSS"
 
-#: emo-vote.php:111
+#: ../emo-vote.php:115
 msgid "Update Options"
 msgstr "Spara"
 
-#: emo-vote.php:112
+#: ../emo-vote.php:116
 msgid "Add field"
 msgstr "Lägg till fält"
 
-#: emo-vote.php:113
+#: ../emo-vote.php:117
 msgid "You can't add more then five fields"
 msgstr "Du kan inte lägga till fler än fem fält"
 
-#: emo-vote.php:173
+#: ../emo-vote.php:167
 msgid "Feeling"
 msgstr "Känner du dig"
+
+#: ../emo-vote.php:319
+msgid "Title"
+msgstr "Titel"
+
+#: ../emo-vote.php:323
+msgid "Posts per feeling"
+msgstr "Antal poster per känsla"
+
+#: ../emo-vote.php:325
+msgid "Default value is five posts per feeling"
+msgstr "Fem inlägg visas om värde saknas"
+
+#: ../emo-vote.php:332
+#: ../emo-vote.php:333
+#, fuzzy
+msgid "Emo Vote"
+msgstr "Emo Vote inställningar"
 
