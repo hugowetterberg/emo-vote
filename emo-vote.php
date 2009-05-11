@@ -112,7 +112,7 @@ function emo_options_page() {
 		<p class="submit">
 			<span id="emo_vote_url" style="display: none;"><? echo emo_path('images/'); ?></span>
 			<input type="hidden" name="<? echo EMO_OPTIONS; ?>[titles]" id="emo_options_titles" value="" />
-			<input type="submit" name="<? echo EMO_OPTIONS; ?>[submit]" id="emo_options_submit" value="<? _e('Update Options',EMO_LOCAL); ?>" />
+			<input class="button-primary" type="submit" name="<? echo EMO_OPTIONS; ?>[submit]" id="emo_options_submit" value="<? _e('Update Options',EMO_LOCAL); ?>" />
 			<input type="submit" name="emo_add" value="<? _e('Add field',EMO_LOCAL); ?>" id="emo_add" />
 			<span class="emo_vote_error hidden"><? _e('You can\'t add more then five fields',EMO_LOCAL); ?></span>
 		</p>

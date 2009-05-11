@@ -116,8 +116,7 @@ jQuery(document).ready(function() {
 	jQuery('.emo-vote input[@type=checkbox]').checkbox({
 		cls: 'jquery-checkbox',
 		empty: jQuery('input.emo_url').val()+'images/empty.png'
-	});
-	jQuery('.emo-vote input[@type=checkbox]').click(function() {
+	}).click(function() {
 		if(jQuery(this).attr('disabled'))
 			return;
 		
